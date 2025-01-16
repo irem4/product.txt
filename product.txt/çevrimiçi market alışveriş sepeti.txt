@@ -1,0 +1,91 @@
+import os
+
+class Market:
+    def __init__(self, file_name="product.txt"):
+        self.file_name = file_name
+        if not os.path.exists(self.file_name):
+            with open(self.file_name, 'w') as file:
+                pass  # dosya yoksa oluşturulsun
+
+    def __del__(self):
+        print("Market nesnesi yok ediliyor, Dosya kapatılıyor.")
+
+    def list_products(self):
+        try:
+            with open(self.file_name, 'r') as file:
+                lines = file.readlines()
+                if not lines:
+                    print("\nÜrün bulunamadı.")
+                else:
+                    print("\nÜrün Listesi:")
+                    for index, line in enumerate(lines, start=1):
+                        name, category, price, stock = line.strip().split(',')
+                        print(f"{index}. Ürün Adı: {name}, Kategori: {category}, Fiyat: {price}, Stok: {stock}")
+        except Exception as e:
+            print(f"Hata: {e}")
+
+    def add_product(self, name, category, price, stock):
+        try:
+            with open(self.file_name, 'a') as file:
+                file.write(f"{name},{category},{price},{stock}\n")
+
+            print("\nÜrün başarıyla eklendi.")
+        except Exception as e:
+            print(f"Hata: {e}")
+
+    def delete_product(self, product_index):
+        try:
+            with open(self.file_name, 'r') as file:
+                lines = file.readlines()
+
+            if 0 < product_index <= len(lines):
+                del lines[product_index - 1]
+
+                with open(self.file_name, 'w') as file:
+                    file.writelines(lines)
+
+                print("\nÜrün başarıyla silindi.")
+            else:
+                print("Geçersiz ürün numarası.")
+        except Exception as e:
+            print(f"Hata: {e}")
+
+def main_menu():
+    market = Market()
+
+    while True:
+        print("""
+*** MENÜ ***
+1) Ürünleri Listele
+2) Ürün Ekle
+3) Ürün Sil
+4) Çıkış
+""")
+        try:
+            choice = int(input("Seçiminiz: "))
+
+            if choice == 1:
+                market.list_products()
+            elif choice == 2:
+                name = input("Ürün Adı: ")
+                category = input("Kategori: ")
+                price = input("Fiyat: ")
+                stock = input("Stok Miktarı: ")
+                market.add_product(name, category, price, stock)
+            elif choice == 3:
+                market.list_products()
+                try:
+                    product_index = int(input("\nSilmek istediğiniz ürünün numarasını girin: "))
+                    market.delete_product(product_index)
+                except ValueError:
+                    print("Lütfen geçerli bir numara girin.")
+            elif choice == 4:
+                print("Programdan çıkılıyor.")
+                break
+            else:
+                print("Geçersiz seçim. Lütfen 1-4 arasında bir seçim yapın.")
+        except ValueError:
+            print("Lütfen geçerli bir numara girin.")
+
+if __name__ == "__main__":
+    main_menu()
